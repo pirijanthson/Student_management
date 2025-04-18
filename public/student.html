@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <style>
+
+header {
+            background-color: #004d40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+#successAlert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050; 
+    background-color: #a3f0a1; 
+    color: #ffffff; 
+    padding: 1rem 1.5rem; 
+    font-size: 1.1rem; 
+    border-radius: 0.75rem; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+    display: none; 
+    width: 80%; 
+    max-width: 450px; 
+    text-align: center; 
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; 
+    opacity: 0; 
+}
+
+#successAlert.show {
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+}
+
+#successAlert .btn-close {
+    color: #ffffff; 
+    opacity: 0.7; 
+}
+
+#successAlert .btn-close:hover {
+    opacity: 1; 
+}
+
+body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+
+      .container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }  
+
+    h2 {
+            margin-bottom: 1.5rem;
+            color: #004d40;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #004d40;
+            box-shadow: none;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #00796b;
+            box-shadow: 0 0 0 0.2rem rgba(0, 121, 107, 0.25);
+        }
+
+    .btn {
+            border-radius: 0.5rem;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #004d40;
+            border-color: #004d40;
+        }
+
+        .btn-primary:hover {
+            background-color: #003d34;
+            border-color: #003d34;
+        }
+
+        .btn-secondary {
+            background-color: #00796b;
+            border-color: #00796b;
+        }
+
+        .btn-secondary:hover {
+            background-color: #004d40;
+            border-color: #004d40;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-form input {
+            flex: 1;
+        }
+
+    .table {
+        background-color: #ffffff; 
+        border-radius: 0.5rem; 
+        overflow: hidden; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    th {
+        background-color: #007bff; 
+        color: #fff; 
+        padding: 1rem; 
+    }
+
+    td {
+        padding: 0.75rem; 
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <header>
+            <h1 class="mb-4">Student Management System</h1> 
+         </header>
+         <br>
+        <div id="successAlert" class="alert alert-info alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> <span id="successMessage">Your action was successful.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <h2>Filter Students</h2>
+        <form id="filterForm" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <select id="filterCategory" name="filterCategory" class="form-select">
+                        <option value="SID">SID</option>
+                        <option value="FirstName">First Name</option>
+                        <option value="LastName">Last Name</option>
+                        <option value="Email">Email</option>
+                        <option value="City">Nearest City</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Course">Course</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" id="filterValue" name="filterValue" class="form-control" placeholder="Enter value to search" required>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Search</button>
+                    <button type="button" id="clearFilter" class="btn btn-secondary">Clear Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-bordered table-striped" id="studentTable">
+            <thead>
+                <tr>
+                    <th>SID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Nearest City</th>
+                    <th>Course</th>
+                    <th>Guardian</th>
+                    <th>Subject</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h2>Add Student</h2>
+        <form id="studentForm">
+            <div class="mb-3" id="sidField">
+                <input type="text" id="SID" name="SID" class="form-control" placeholder="SID" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" id="FirstName" name="FirstName" class="form-control" placeholder="First Name" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" id="LastName" name="LastName" class="form-control" placeholder="Last Name" required>
+            </div>
+            <div class="mb-3">
+                <input type="email" id="Email" name="Email" class="form-control" placeholder="Email" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" id="City" name="City" class="form-control" placeholder="City" required>
+            </div>
+            <div class="mb-3">
+                <select id="Course" name="Course" class="form-select" required>
+                    <option value="">Select Course</option>
+                    <option value="Foundation">Foundation</option>
+                    <option value="HND">HND</option>
+                    <option value="Degree">Degree</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>Subjects:</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Subject[]" value="ETF" id="subjectETF">
+                    <label class="form-check-label" for="subjectETF">ETF</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Subject[]" value="ORDBMS" id="subjectORDBMS">
+                    <label class="form-check-label" for="subjectORDBMS">ORDBMS</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Subject[]" value="OOP" id="subjectOOP">
+                    <label class="form-check-label" for="subjectOOP">OOP</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Subject[]" value="SE" id="subjectSE">
+                    <label class="form-check-label" for="subjectSE">SE</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Subject[]" value="HCL" id="subjectHCL">
+                    <label class="form-check-label" for="subjectHCL">HCL</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Subject[]" value="IP" id="subjectIP">
+                    <label class="form-check-label" for="subjectIP">IP</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <input type="text" id="Guardian" name="Guardian" class="form-control" placeholder="Guardian" required>
+            </div>
+            <button type="submit" class="btn btn-success">Save</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            loadStudents();
+
+            function loadStudents(category = '', value = '') {
+                $.ajax({
+                    url: '/students',
+                    type: 'GET',
+                    data: { category: category, value: value },
+                    success: function (students) {
+                        let rows = '';
+                        students.forEach(function (student) {
+                            rows += `
+                                <tr>
+                                    <td>${student.SID}</td>
+                                    <td>${student.FirstName}</td>
+                                    <td>${student.LastName}</td>
+                                    <td>${student.email}</td>
+                                    <td>${student.City}</td>
+                                    <td>${student.Course}</td>
+                                    <td>${student.Guardian}</td>
+                                    <td>${student.Subject.join(', ')}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm edit-btn" data-sid="${student.SID}">Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-btn" data-sid="${student.SID}">Delete</button>
+                                    </td>
+                                </tr>`;
+                        });
+                        $('#studentTable tbody').html(rows);
+                    }
+                });
+            }
+
+            function showSuccessMessage(message) {
+                $('#successMessage').text(message);
+                $('#successAlert').fadeIn();
+
+                setTimeout(function () {
+                    $('#successAlert').fadeOut();
+                }, 3000);
+            }
+
+            $('#studentForm').on('submit', function (e) {
+                e.preventDefault();
+
+                let action = $('#SID').is(':visible') ? 'add' : 'edit';
+                let url = action === 'edit' ? `/students/${$('#SID').val()}` : '/students';
+                let method = action === 'edit' ? 'PUT' : 'POST';
+
+                let selectedSubjects = [];
+                $('input[name="Subject[]"]:checked').each(function() {
+                    selectedSubjects.push($(this).val());
+                });
+
+                let studentData = {
+                    SID: $('#SID').val(),
+                    FirstName: $('#FirstName').val(),
+                    LastName: $('#LastName').val(),
+                    Email: $('#Email').val(),
+                    City: $('#City').val(),
+                    Course: $('#Course').val(),
+                    Guardian: $('#Guardian').val(),
+                    Subject: selectedSubjects
+                };
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    contentType: 'application/json',
+                    data: JSON.stringify(studentData),
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            showSuccessMessage(response.message);
+                            loadStudents();
+                            $('#studentForm')[0].reset();
+                            $('#SID').val('');
+                            $('#sidField').show();  
+                        }
+                    }
+                });
+            });
+
+            $('#filterForm').on('submit', function (e) {
+                e.preventDefault();
+                loadStudents($('#filterCategory').val(), $('#filterValue').val());
+            });
+
+            $('#clearFilter').on('click', function () {
+                $('#filterForm')[0].reset();
+                loadStudents();
+            });
+
+            $(document).on('click', '.edit-btn', function () {
+                let sid = $(this).data('sid');
+                $.ajax({
+                    url: '/students',
+                    type: 'GET',
+                    success: function (students) {
+                        let student = students.find(student => student.SID == sid);
+                        $('#SID').val(student.SID).hide();  
+                        $('#FirstName').val(student.FirstName);
+                        $('#LastName').val(student.LastName);
+                        $('#Email').val(student.email);
+                        $('#City').val(student.City);
+                        $('#Course').val(student.Course);
+                        $('#Guardian').val(student.Guardian);
+
+                        $('input[name="Subject[]"]').prop('checked', false);
+
+                        student.Subject.forEach(function(subject) {
+                            $(`input[name="Subject[]"][value="${subject}"]`).prop('checked', true);
+                        });
+
+                        $('#sidField').hide();  
+                    }
+                });
+            });
+
+            $(document).on('click', '.delete-btn', function () {
+                if (confirm('Are you sure you want to delete this student?')) {
+                    let sid = $(this).data('sid');
+                    $.ajax({
+                        url: `/students/${sid}`,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.status === 'success') {
+                                showSuccessMessage(response.message);
+                                loadStudents();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
